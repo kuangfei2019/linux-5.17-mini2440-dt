@@ -34,6 +34,7 @@
 #include <asm/delay.h>
 #include <asm/irq.h>
 #include <asm/io.h>
+#include <asm/regs-mem.h>
 
 #include "dm9000.h"
 
@@ -1426,7 +1427,10 @@ dm9000_probe(struct platform_device *pdev)
 	struct regulator *power;
 	bool inv_mac_addr = false;
 	u8 addr[ETH_ALEN];
-
+#if defined(CONFIG_MACH_MINI2440_DT)
+        unsigned int oldval_bwscon = *(volatile unsigned int *)S3C2410_BWSCON;
+        unsigned int oldval_bankcon4 = *(volatile unsigned int *)S3C2410_BANKCON4;
+#endif
 	power = devm_regulator_get(dev, "vcc");
 	if (IS_ERR(power)) {
 		if (PTR_ERR(power) == -EPROBE_DEFER)
@@ -1478,6 +1482,11 @@ dm9000_probe(struct platform_device *pdev)
 	SET_NETDEV_DEV(ndev, &pdev->dev);
 
 	dev_dbg(&pdev->dev, "dm9000_probe()\n");
+
+#if defined(CONFIG_MACH_MINI2440_DT)
+	*((volatile unsigned int *)S3C2410_BWSCON) = (oldval_bwscon & ~(3<<16)) | (1<<16) ;
+	*((volatile unsigned int *)S3C2410_BANKCON4) = 0x1f7c;
+#endif
 
 	/* setup board info structure */
 	db = netdev_priv(ndev);
@@ -1707,6 +1716,10 @@ dm9000_probe(struct platform_device *pdev)
 
 out:
 	dev_err(db->dev, "not found (%d).\n", ret);
+#if defined(CONFIG_MACH_MINI2440_DT)
+        *(volatile unsigned int *)S3C2410_BWSCON   = oldval_bwscon;
+        *(volatile unsigned int *)S3C2410_BANKCON4 = oldval_bankcon4;
+#endif
 
 	dm9000_release_board(pdev, db);
 	free_netdev(ndev);
