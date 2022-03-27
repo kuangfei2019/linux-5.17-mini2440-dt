@@ -340,7 +340,7 @@ void __init s3c2410_common_clk_init(struct device_node *np, unsigned long xti_f,
 		s3c2410_common_clk_register_fixed_ext(ctx, xti_f);
 
 	if (current_soc == S3C2410) {
-		if (clk_hw_get_rate(hws[XTI]) == 12 * MHZ) {
+		if ((hws[XTI] != ERR_PTR(-ENOENT)) && (clk_hw_get_rate(hws[XTI]) == 12 * MHZ)) {
 			s3c2410_plls[mpll].rate_table = pll_s3c2410_12mhz_tbl;
 			s3c2410_plls[upll].rate_table = pll_s3c2410_12mhz_tbl;
 		}
@@ -350,7 +350,7 @@ void __init s3c2410_common_clk_init(struct device_node *np, unsigned long xti_f,
 				ARRAY_SIZE(s3c2410_plls), reg_base);
 
 	} else { /* S3C2440, S3C2442 */
-		if (clk_hw_get_rate(hws[XTI]) == 12 * MHZ) {
+		if ((hws[XTI] != ERR_PTR(-ENOENT)) && (clk_hw_get_rate(hws[XTI]) == 12 * MHZ)) {
 			/*
 			 * plls follow different calculation schemes, with the
 			 * upll following the same scheme as the s3c2410 plls
