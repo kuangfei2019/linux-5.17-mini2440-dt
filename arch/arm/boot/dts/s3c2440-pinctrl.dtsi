@@ -61,21 +61,6 @@
 		#gpio-cells = <2>;
 	};
 
-	gpk: gpk {
-		gpio-controller;
-		#gpio-cells = <2>;
-	};
-
-	gpl: gpl {
-		gpio-controller;
-		#gpio-cells = <2>;
-	};
-
-	gpm: gpm {
-		gpio-controller;
-		#gpio-cells = <2>;
-	};
-
 	/*
 	 * Pin groups
 	 */
@@ -95,28 +80,8 @@
 		samsung,pin-function = <EXYNOS_PIN_FUNC_2>;
 	};
 
-	uart1_fctl: uart1-fctl {
-		samsung,pins = "gph-10", "gph-11";
-		samsung,pin-function = <EXYNOS_PIN_FUNC_2>;
-	};
-
 	uart2_data: uart2-data {
 		samsung,pins = "gph-4", "gph-5";
-		samsung,pin-function = <EXYNOS_PIN_FUNC_2>;
-	};
-
-	uart2_fctl: uart2-fctl {
-		samsung,pins = "gph-6", "gph-7";
-		samsung,pin-function = <EXYNOS_PIN_FUNC_2>;
-	};
-
-	uart3_data: uart3-data {
-		samsung,pins = "gph-6", "gph-7";
-		samsung,pin-function = <EXYNOS_PIN_FUNC_2>;
-	};
-
-	extuart_clk: extuart-clk {
-		samsung,pins = "gph-12";
 		samsung,pin-function = <EXYNOS_PIN_FUNC_2>;
 	};
 

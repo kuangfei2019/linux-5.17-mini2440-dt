@@ -90,7 +90,7 @@
 &uart_1 {
 	status = "okay";
 	pinctrl-names = "default";
-	pinctrl-0 = <&uart1_data>, <&uart1_fctl>;
+	pinctrl-0 = <&uart1_data>;
 };
 
 &uart_2 {
