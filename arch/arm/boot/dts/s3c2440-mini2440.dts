@@ -89,6 +89,14 @@
 	      cd-gpios = <&gpg 8 GPIO_ACTIVE_LOW>;
 	      wp-gpios = <&gph 8 GPIO_ACTIVE_LOW>;
         };
+
+        uda1341: audio-codec {
+	      compatible = "nxp,uda1341";
+	      l3-clk-gpios = <&gpb 4 GPIO_ACTIVE_LOW>;
+	      l3-data-gpios = <&gpb 3 GPIO_ACTIVE_LOW>;
+	      l3-mode-gpios = <&gpb 2 GPIO_ACTIVE_LOW>;
+	      uda-model = <2>;
+	};
 };
 
 &rtc {

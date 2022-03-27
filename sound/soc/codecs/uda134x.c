@@ -20,6 +20,9 @@
 
 #include <sound/uda134x.h>
 #include <sound/l3.h>
+#include <linux/of.h>
+#include <linux/of_device.h>
+#include <linux/of_gpio.h>
 
 #include "uda134x.h"
 
@@ -541,15 +544,63 @@ static const struct regmap_config uda134x_regmap_config = {
 	.reg_write = uda134x_regmap_write,
 };
 
+#ifdef CONFIG_OF
+static int uda134x_s3c_parse_dt(struct device *dev,
+		struct platform_device *pdev, struct uda134x_platform_data *pdata)
+{
+	struct device_node *node = dev->of_node;
+	int uda_model;
+	struct l3_pins *l3 = &pdata->l3;
+
+	/* if the uda-model property is not specified, assume it as 1 */
+	if (of_property_read_u32(node, "uda-model", &uda_model))
+		uda_model = 1;
+	pdata->model = uda_model;
+
+	l3->gpio_clk = of_get_named_gpio(node, "l3-clk-gpios", 0);
+	if (!l3->gpio_clk) {
+		dev_err(&pdev->dev, "l3 gpio clk not find\n");
+		return -EINVAL;
+	}
+	l3->gpio_data =  of_get_named_gpio(node, "l3-data-gpios", 0);
+	if (!l3->gpio_data) {
+		dev_err(&pdev->dev, "l3 gpio data not find\n");
+		return -EINVAL;
+	}
+	l3->gpio_mode = of_get_named_gpio(node, "l3-mode-gpios", 0);
+	if (!l3->gpio_mode) {
+		dev_err(&pdev->dev, "l3 gpio mode not find\n");
+		return -EINVAL;
+	}
+
+	return 0;
+}
+#else
+static int uda134x_s3c_parse_dt(struct device *dev,
+		struct sdhci_host *host, struct uda134x_platform_data *pdata)
+{
+	return -EINVAL;
+}
+#endif
+
 static int uda134x_codec_probe(struct platform_device *pdev)
 {
 	struct uda134x_platform_data *pd = pdev->dev.platform_data;
 	struct uda134x_priv *uda134x;
 	int ret;
 
-	if (!pd) {
+	if (!pd && !pdev->dev.of_node) {
 		dev_err(&pdev->dev, "Missing L3 bitbang function\n");
 		return -ENODEV;
+	}
+
+	if (!pd) {
+		pd = devm_kzalloc(&pdev->dev, sizeof(*pd), GFP_KERNEL);
+		if (!pd)
+			return -ENOMEM;
+		ret = uda134x_s3c_parse_dt(&pdev->dev, pdev, pd);
+		if (ret)
+			return -ENODEV;
 	}
 
 	uda134x = devm_kzalloc(&pdev->dev, sizeof(*uda134x), GFP_KERNEL);
@@ -566,7 +617,7 @@ static int uda134x_codec_probe(struct platform_device *pdev)
 	}
 
 	uda134x->regmap = devm_regmap_init(&pdev->dev, NULL, pd,
-		&uda134x_regmap_config);
+			&uda134x_regmap_config);
 	if (IS_ERR(uda134x->regmap))
 		return PTR_ERR(uda134x->regmap);
 
@@ -574,9 +625,19 @@ static int uda134x_codec_probe(struct platform_device *pdev)
 			&soc_component_dev_uda134x, &uda134x_dai, 1);
 }
 
+#if defined (CONFIG_MACH_MINI2440_DT)
+static const struct of_device_id mini2440_uda_match[] = {
+        { .compatible = "nxp,uda1341", .data = (void *)0 },
+        {},
+};
+#endif
+
 static struct platform_driver uda134x_codec_driver = {
 	.driver = {
 		.name = "uda134x-codec",
+#if defined (CONFIG_MACH_MINI2440_DT)
+		.of_match_table = of_match_ptr(mini2440_uda_match),
+#endif
 	},
 	.probe = uda134x_codec_probe,
 };
