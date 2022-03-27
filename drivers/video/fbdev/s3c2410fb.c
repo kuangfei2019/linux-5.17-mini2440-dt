@@ -820,6 +820,73 @@ static const char driver_name[] = "s3c2410fb";
 static int s3c24xxfb_probe(struct platform_device *pdev,
 			   enum s3c_drv_type drv_type)
 {
+#if defined (CONFIG_MACH_MINI2440_DT)
+        struct device_node *np;
+        struct device *dev = &pdev->dev;
+        struct s3c2410fb_info *info;
+        struct s3c2410fb_display *display;
+        struct fb_info *fbinfo;
+        struct s3c2410fb_mach_info *mach_info;
+        struct resource *res;
+        int ret;
+        int irq;
+        int i;
+        int size;
+        u32 lcdcon1;
+
+        np = dev->of_node;
+        if (!np) {
+                dev_err(dev, "could not find device info\n");
+                return -EINVAL;
+        }
+
+        display = devm_kzalloc(dev, sizeof(*display), GFP_KERNEL);
+        if (!display) {
+                dev_err(dev, "no mem\n");
+                return -ENOMEM;
+        }
+
+        mach_info = devm_kzalloc(dev, sizeof(*mach_info), GFP_KERNEL);
+        if (!display) {
+                dev_err(dev, "no mem\n");
+                return -ENOMEM;
+        }
+        dev->platform_data = mach_info;
+
+        mach_info->displays = display;
+        mach_info->num_displays = 1;
+        mach_info->default_display = 0;
+
+        of_property_read_u32(np, "lcdcon5", (u32 *)(&display->lcdcon5));
+        of_property_read_u32(np, "type", &display->type);
+        of_property_read_u16(np, "width", &display->width);
+        of_property_read_u16(np, "height", &display->height);
+        of_property_read_u32(np, "pixclock", &display->pixclock);
+        of_property_read_u16(np, "xres", &display->xres);
+        of_property_read_u16(np, "yres", &display->yres);
+        of_property_read_u16(np, "bpp", &display->bpp);
+        of_property_read_u16(np, "left_margin", &display->left_margin);
+        of_property_read_u16(np, "right_margin", &display->right_margin);
+        of_property_read_u16(np, "hsync_len", &display->hsync_len);
+        of_property_read_u16(np, "upper_margin", &display->upper_margin);
+        of_property_read_u16(np, "lower_margin", &display->lower_margin);
+        of_property_read_u16(np, "vsync_len", &display->vsync_len);
+
+        pr_debug("%s:       lcdcon5:  0x%lx\n", __func__, display->lcdcon5);
+        pr_debug("%s:          type:  0x%x\n", __func__, display->type);
+        pr_debug("%s:         width:  0x%x\n", __func__, display->width);
+        pr_debug("%s:        height:  0x%x\n", __func__, display->height);
+        pr_debug("%s:      pixclock:  0x%x\n", __func__, display->pixclock);
+        pr_debug("%s:          xres:  0x%x\n", __func__, display->xres);
+        pr_debug("%s:          yres:  0x%x\n", __func__, display->yres);
+        pr_debug("%s:           bpp:  0x%x\n", __func__, display->bpp);
+        pr_debug("%s:   left_margin:  0x%x\n", __func__, display->left_margin);
+        pr_debug("%s:  right_margin:  0x%x\n", __func__, display->right_margin);
+        pr_debug("%s:     hsync_len:  0x%x\n", __func__, display->hsync_len);
+        pr_debug("%s:  upper_margin:  0x%x\n", __func__, display->upper_margin);
+        pr_debug("%s:  lower_margin:  0x%x\n", __func__, display->lower_margin);
+        pr_debug("%s:     vsync_len:  0x%x\n", __func__, display->vsync_len);
+#else
 	struct s3c2410fb_info *info;
 	struct s3c2410fb_display *display;
 	struct fb_info *fbinfo;
@@ -845,7 +912,7 @@ static int s3c24xxfb_probe(struct platform_device *pdev,
 	}
 
 	display = mach_info->displays + mach_info->default_display;
-
+#endif
 	irq = platform_get_irq(pdev, 0);
 	if (irq < 0) {
 		dev_err(&pdev->dev, "no irq for device\n");
@@ -1095,6 +1162,13 @@ static int s3c2410fb_resume(struct platform_device *dev)
 #define s3c2410fb_resume  NULL
 #endif
 
+#if defined (CONFIG_MACH_MINI2440_DT)
+static const struct of_device_id mini2440_lcd_match[] = {
+        { .compatible = "mini2440,lcd", .data = (void *)0 },
+        {},
+};
+#endif
+
 static struct platform_driver s3c2410fb_driver = {
 	.probe		= s3c2410fb_probe,
 	.remove		= s3c2410fb_remove,
@@ -1102,6 +1176,9 @@ static struct platform_driver s3c2410fb_driver = {
 	.resume		= s3c2410fb_resume,
 	.driver		= {
 		.name	= "s3c2410-lcd",
+#if defined (CONFIG_MACH_MINI2440_DT)
+		.of_match_table = of_match_ptr(mini2440_lcd_match),
+#endif
 	},
 };
 

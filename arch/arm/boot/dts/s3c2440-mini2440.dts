@@ -40,6 +40,32 @@
                         davicom,no-eeprom;
                 };
         };
+
+        fb0: fb@4d000000{
+             compatible = "mini2440,lcd";
+             reg = <0x4D000000 0x60>;
+             interrupts = <0 0 16 3>;
+             clocks = <&clocks HCLK_LCD>;
+             clock-names = "lcd";
+             pinctrl-names = "default";
+             pinctrl-0 = <&lcd_pinctrl &lcd_backlight>;
+             status = "okay";
+
+             lcdcon5 = <0xb09>;
+             type = <0x60>;
+             width = /bits/ 16 <240>;
+             height = /bits/ 16 <320>;
+             pixclock = <100000>;
+             xres = /bits/ 16 <240>;
+             yres = /bits/ 16 <320>;
+             bpp = /bits/ 16 <16>;
+             left_margin = /bits/ 16 <2>;
+             right_margin =/bits/ 16  <32>;
+             hsync_len = /bits/ 16 <41>;
+             upper_margin = /bits/ 16 <2>;
+             lower_margin = /bits/ 16 <2>;
+             vsync_len = /bits/ 16 <10>;
+        };
 };
 
 &rtc {
