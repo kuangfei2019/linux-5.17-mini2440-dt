@@ -1520,7 +1520,7 @@ static int s3cmci_probe(struct platform_device *pdev)
 	host = mmc_priv(mmc);
 	host->mmc 	= mmc;
 	host->pdev	= pdev;
-	host->irq_cd = -EINVAL;
+	host->irq_cd	= -EINVAL;
 
 	if (pdev->dev.of_node)
 		ret = s3cmci_probe_dt(host);
