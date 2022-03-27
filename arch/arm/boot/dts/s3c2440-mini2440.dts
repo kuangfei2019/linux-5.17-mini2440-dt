@@ -7,6 +7,7 @@
 
 /dts-v1/;
 #include <dt-bindings/interrupt-controller/irq.h>
+#include <dt-bindings/gpio/gpio.h>
 #include "s3c2440.dtsi"
 
 / {
@@ -73,7 +74,20 @@
               interrupts = <0 0 26 3>;
               clocks = <&clocks UCLK>, <&clocks HCLK_USBH>;
               clock-names = "usb-bus-host", "usb-host";
-              status = "okay";
+	      status = "okay";
+        };
+
+        mmc0: mmc@5a000000 {
+	      compatible = "samsung,s3c2440-sdi";
+	      pinctrl-names = "default";
+	      pinctrl-0 = <&sdi_pins>;
+	      reg = <0x5a000000 0x100000>;
+	      interrupts = <0 0 21 3>;
+	      clocks = <&clocks PCLK_SDI>;
+	      clock-names = "sdi";
+	      bus-width = <4>;
+	      cd-gpios = <&gpg 8 GPIO_ACTIVE_LOW>;
+	      wp-gpios = <&gph 8 GPIO_ACTIVE_LOW>;
         };
 };
 

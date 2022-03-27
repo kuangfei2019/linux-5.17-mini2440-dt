@@ -85,6 +85,11 @@
 		samsung,pin-function = <EXYNOS_PIN_FUNC_2>;
 	};
 
+        sdi_pins: sdi_pins {
+                samsung,pins = "gpe-5", "gpe-6", "gpe-7", "gpe-8", "gpe-9", "gpe-10";
+                samsung,pin-function = <EXYNOS_PIN_FUNC_2>;
+        };
+
 	i2c0_bus: i2c0-bus {
 		samsung,pins = "gpe-14", "gpe-15";
 		samsung,pin-function = <EXYNOS_PIN_FUNC_2>;
