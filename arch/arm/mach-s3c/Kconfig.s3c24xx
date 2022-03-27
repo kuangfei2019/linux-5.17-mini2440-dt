@@ -460,6 +460,18 @@ config MACH_MINI2440
 	  Say Y here to select support for the MINI2440. Is a 10cm x 10cm board
 	  available via various sources. It can come with a 3.5" or 7" touch LCD.
 
+config MACH_MINI2440_DT
+	bool "Friendlyarm MINI2440 machine using devicetree"
+	select TIMER_OF
+	select USE_OF
+	select PINCTRL
+	select PINCTRL_S3C24XX
+	help
+	  Machine support for Friendlyarm MINI2440 machines with device tree enabled.
+	  Select this if a fdt blob is available for the S3C2440 SoC based board.
+	  Note: This is under development and not all peripherals can be supported
+	  with this machine file.
+
 config MACH_NEXCODER_2440
 	bool "NexVision NEXCODER 2440 Light Board"
 	select S3C2440_XTAL_12000000
